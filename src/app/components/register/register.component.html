@@ -1,0 +1,52 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <mat-card class="w-full max-w-md p-8 rounded-2xl shadow-xl border border-gray-100">
+    
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Create Account</h1>
+      <p class="text-gray-500 mt-2">Join Smart Finance to track your wealth</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      
+      <div *ngIf="errorMessage" class="p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+        {{ errorMessage }}
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" type="text" placeholder="johndoe123">
+        <mat-error *ngIf="registerForm.get('username')?.hasError('required')">Username is required</mat-error>
+        <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">Must be at least 3 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Email Address</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="you@example.com">
+        <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password">
+        <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Password is required</mat-error>
+        <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">Must be at least 6 characters</mat-error>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" 
+              [disabled]="registerForm.invalid || isLoading" 
+              class="w-full h-12 text-lg mt-2 rounded-lg">
+        <span *ngIf="!isLoading">Sign Up</span>
+        <span *ngIf="isLoading">Creating account...</span>
+      </button>
+
+      <div class="text-center mt-4">
+        <span class="text-sm text-gray-500">Already have an account? </span>
+        <a routerLink="/login" class="text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer">
+          Sign In
+        </a>
+      </div>
+
+    </form>
+  </mat-card>
+</div>

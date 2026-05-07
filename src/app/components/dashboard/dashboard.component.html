@@ -1,0 +1,168 @@
+<div class="max-w-7xl mx-auto flex flex-col gap-6">
+
+ <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 border-b border-gray-200 pb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Financial Overview</h1>
+      <p class="text-gray-500 text-sm mt-1">Track your spending and income</p>
+    </div>
+     
+    <!-- Add Transaction Button -->
+  <div class="w-full sm:w-auto flex items-center gap-3">
+    <!-- Add Transaction Button -->
+    <button mat-flat-button color="primary" class="h-[56px] px-6 rounded-lg shadow-sm font-medium" (click)="openAddTransactionDialog()">
+    <mat-icon>add</mat-icon>
+    <span class="hidden sm:inline ml-1">Add Entry</span>
+  </button>
+
+  <!-- 2. Added subscriptSizing="dynamic" (if on Angular 15+) to perfectly kill bottom spacing -->
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full sm:w-48 m-0 p-0 hide-subscript">
+    <mat-select [(value)]="currentMonth" (selectionChange)="onMonthChange($event.value)">
+      <mat-option *ngFor="let month of availableMonths" [value]="month.value">
+        {{ month.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+  </div>
+    
+  <mat-card class="mb-6 rounded-xl shadow-sm border border-indigo-100 overflow-hidden bg-gradient-to-r from-indigo-50 to-purple-50">
+  <div class="p-6">
+    <div class="flex justify-between items-start">
+      <div class="flex items-center gap-2">
+        <mat-icon class="text-indigo-600">auto_awesome</mat-icon>
+        <h2 class="text-lg font-bold text-indigo-900">AI Financial Advisor</h2>
+      </div>
+      
+      <!-- Generate Button -->
+      <button *ngIf="!aiSummary && !isAiLoading" mat-stroked-button color="primary" class="bg-white" (click)="generateAiSummary()">
+        Generate Insights
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isAiLoading" class="mt-4 flex items-center gap-3 text-indigo-600">
+      <mat-spinner diameter="20"></mat-spinner>
+      <span class="text-sm font-medium animate-pulse">Analyzing your transactions...</span>
+    </div>
+
+    <!-- The Result Text -->
+    <div *ngIf="aiSummary" class="mt-4 text-gray-800 leading-relaxed text-sm whitespace-pre-line">
+      {{ aiSummary }}
+    </div>
+  </div>
+</mat-card>
+
+  <div *ngIf="!isLoading" class="flex flex-col gap-6">
+    
+    <!-- Top Row: Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Income Card -->
+      <mat-card class="p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div class="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Total Income</div>
+        <div class="text-3xl font-bold text-green-600">+{{ totalIncome | currency:'INR' }}</div>
+      </mat-card>
+
+      <!-- Expense Card -->
+      <mat-card class="p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div class="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Total Expense</div>
+        <div class="text-3xl font-bold text-red-600">-{{ totalExpense | currency:'INR' }}</div>
+      </mat-card>
+
+      <!-- Net Balance Card -->
+      <mat-card class="p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between" 
+                [ngClass]="{'bg-indigo-50 border-indigo-100': netBalance >= 0, 'bg-red-50 border-red-100': netBalance < 0}">
+        <div class="text-sm font-medium text-gray-600 mb-2 uppercase tracking-wider">Net Balance</div>
+        <div class="text-3xl font-bold text-gray-900">{{ netBalance | currency:'INR' }}</div>
+      </mat-card>
+    </div>
+
+    <!-- Bottom Row: Chart & Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Expense Breakdown Chart -->
+      <mat-card class="p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col h-[400px]">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Expense Breakdown</h2>
+        
+        <div class="relative flex-grow w-full h-full flex items-center justify-center min-h-0">
+           <!-- Empty state if no expenses -->
+          <div *ngIf="totalExpense === 0" class="text-gray-400 text-sm">No expenses recorded this month.</div>
+          
+          <!-- Chart.js Canvas -->
+          <canvas *ngIf="totalExpense > 0" baseChart
+                  class="max-h-full max-w-full"
+                  [data]="pieChartData"
+                  [options]="pieChartOptions"
+                  [type]="pieChartType">
+          </canvas>
+        </div>
+      </mat-card>
+
+      <!-- Recent Activity Table -->
+      <mat-card class="p-0 rounded-xl shadow-sm border border-gray-100 overflow-hidden h-[400px] flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+          <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
+          <a routerLink="/ledger" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">View All</a>
+        </div>
+        
+        <div class="overflow-y-auto flex-grow">
+          <table class="w-full text-left text-sm text-gray-600">
+            <tbody>
+              <tr *ngFor="let tx of recentTransactions" class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="font-medium text-gray-900">{{ tx.description }}</div>
+                  <div class="text-xs text-gray-500">{{ tx.date }} • {{ tx.category }}</div>
+                </td>
+                <td class="px-6 py-4 text-right font-semibold whitespace-nowrap"
+                    [ngClass]="{'text-red-600': tx.transactionType == 'debited', 'text-green-600': tx.transactionType == 'credited'}">
+                  {{ tx.transactionType == 'credited' ? '+' : '-' }}{{ tx.amount | currency:'INR' }}
+                </td>
+              </tr>
+              <tr *ngIf="recentTransactions.length === 0">
+                <td colspan="2" class="px-6 py-8 text-center text-gray-400">No recent transactions.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <mat-card class="p-6 rounded-xl shadow-sm border border-gray-100">
+  <h2 class="text-lg font-semibold text-gray-800 mb-6">Budget Tracking</h2>
+
+  <div *ngFor="let item of categoryBreakdown" class="group mb-6 last:mb-0">
+    <div class="flex justify-between items-center mb-2">
+      <div class="flex items-center gap-2">
+        <span class="font-medium text-gray-700">{{item.category}}</span>
+        <button mat-icon-button class="opacity-0 group-hover:opacity-100 scale-75 transition-opacity" 
+                (click)="openSetBudget(item)">
+          <mat-icon class="text-gray-400">edit</mat-icon>
+        </button>
+      </div>
+      <div class="text-sm">
+        <span class="font-bold">{{item.totalAmount | currency:'INR'}}</span>
+        <span *ngIf="item.limitAmount" class="text-gray-400 font-normal"> / {{item.limitAmount | currency:'INR'}}</span>
+      </div>
+    </div>
+
+    <div class="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+      <div class="h-full rounded-full transition-all duration-700 ease-out"
+           [style.width.%]="getBudgetPercentage(item.totalAmount, item.limitAmount)"
+           [ngClass]="{
+             'bg-emerald-500': getBudgetPercentage(item.totalAmount, item.limitAmount) < 80,
+             'bg-amber-400': getBudgetPercentage(item.totalAmount, item.limitAmount) >= 80 && getBudgetPercentage(item.totalAmount, item.limitAmount) < 100,
+             'bg-red-500': getBudgetPercentage(item.totalAmount, item.limitAmount) >= 100
+           }">
+      </div>
+    </div>
+    
+    <p *ngIf="item.limitAmount && item.totalAmount > item.limitAmount" 
+       class="text-[10px] text-red-500 font-medium mt-1 uppercase tracking-wider">
+       Limit Exceeded by {{ (item.totalAmount - item.limitAmount) | currency:'INR' }}
+    </p>
+  </div>
+</mat-card>
+  </div>
+</div>

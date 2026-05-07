@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Slight tweak to Material inputs to blend better with Tailwind */
+.mat-mdc-text-field-wrapper {
+    background-color: white !important;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.mdc-notched-outline__notch {
+    border-right: none !important;
+    border-left: none !important;
+}
+
+/* Hide the right wall of the left-most corner */
+.mdc-notched-outline__leading {
+    border-right: none !important;
+}
+
+/* Hide the left wall of the right-most section */
+.mdc-notched-outline__trailing {
+    border-left: none !important;
+}

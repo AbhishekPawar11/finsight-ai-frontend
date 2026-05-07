@@ -1,0 +1,45 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <mat-card class="w-full max-w-md p-8 rounded-2xl shadow-xl border border-gray-100">
+    
+    <div class="text-center mb-8">
+      <img src="finsight-logo.png" 
+       alt="FinSight AI Logo" 
+       class="mx-auto h-20 w-auto mb-4">
+      <!-- <h1 class="text-3xl font-bold text-gray-800">Smart Finance</h1> -->
+      <p class="text-gray-500 mt-2">Sign in to track your expenses</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      
+      <div *ngIf="errorMessage" class="p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+        {{ errorMessage }}
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Email Address</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="you@example.com">
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password">
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" 
+              [disabled]="loginForm.invalid || isLoading" 
+              class="w-full h-12 text-lg mt-2 rounded-lg">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading">Signing in...</span>
+      </button>
+       <div class="text-center mt-4">
+            <span class="text-sm text-gray-500">Don't have an account? </span>
+            <a routerLink="/register" class="text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer">
+             Sign Up
+            </a>
+       </div>
+    </form>
+  </mat-card>
+</div>

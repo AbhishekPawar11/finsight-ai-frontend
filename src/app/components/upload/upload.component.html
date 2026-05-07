@@ -1,0 +1,132 @@
+<div class="max-w-5xl mx-auto flex flex-col gap-6">
+
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">Upload Bank Statement</h1>
+    <p class="text-gray-500">Let AI categorize your transactions automatically.</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r shadow-sm">
+    {{ errorMessage }}
+  </div>
+
+  <mat-card *ngIf="currentStep === 1" class="p-8 rounded-xl shadow-sm border border-gray-100">
+    <div class="flex flex-col gap-6 max-w-md mx-auto w-full">
+      
+      <div class="flex flex-col items-center justify-center w-full">
+        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-indigo-200 border-dashed rounded-xl cursor-pointer bg-indigo-50 hover:bg-indigo-100 transition-colors">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <mat-icon class="text-indigo-500 text-4xl mb-2" style="height: 40px; width: 40px;">cloud_upload</mat-icon>
+                <p class="mb-2 text-sm text-gray-600"><span class="font-semibold text-indigo-600">Click to upload</span> your PDF</p>
+                <p class="text-xs text-gray-500 font-medium truncate px-4">
+                  {{ selectedFile ? selectedFile.name : 'No file selected' }}
+                </p>
+            </div>
+            <input id="dropzone-file" type="file" class="hidden" accept=".pdf" (change)="onFileSelected($event)" />
+        </label>
+      </div>
+
+      <mat-form-field appearance="outline" class="w-full mt-2">
+        <mat-label>PDF Password (Optional)</mat-label>
+        <input matInput type="password" [(ngModel)]="pdfPassword" placeholder="Leave blank if not encrypted">
+        <mat-icon matSuffix class="text-gray-400">lock</mat-icon>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" class="h-12 text-lg rounded-lg shadow-md" 
+              [disabled]="!selectedFile || isLoading" (click)="processAI()">
+        <span *ngIf="!isLoading">Process with AI</span>
+        <span *ngIf="isLoading" class="flex items-center gap-2">
+          <mat-spinner diameter="20" color="accent"></mat-spinner> AI is analyzing...
+        </span>
+      </button>
+
+    </div>
+  </mat-card>
+
+
+  <mat-card *ngIf="currentStep === 2" class="rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    
+    <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100 flex justify-between items-center">
+      <div>
+        <h2 class="text-lg font-bold text-indigo-900">Review AI Categorization</h2>
+        <p class="text-sm text-indigo-700">Please review and correct any mistakes. Your corrections make the AI smarter.</p>
+      </div>
+      <button mat-flat-button color="accent" class="h-10 px-6 font-semibold" (click)="confirmAndSave()" [disabled]="isLoading">
+        {{ isLoading ? 'Saving...' : 'Confirm & Save' }}
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-gray-600">
+        <thead class="bg-gray-50 text-gray-700 uppercase font-semibold text-xs border-b border-gray-200">
+          <tr>
+            <th scope="col" class="px-6 py-4">Date</th>
+            <th scope="col" class="px-6 py-4">Description</th>
+            <th scope="col" class="px-6 py-4 text-right">Amount</th>
+            <th scope="col" class="px-6 py-4 text-right">Transaction Type</th>
+            <th scope="col" class="px-6 py-4">Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of transactions" 
+              class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              [ngClass]="{'bg-yellow-50 hover:bg-yellow-100': tx.confidence == 'LOW'}">
+            
+            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
+              {{ tx.date }}
+            </td>
+            
+            <td class="px-6 py-4">
+              {{ tx.description }}
+              <span *ngIf="tx.confidence == 'LOW'" class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-200 text-yellow-800">
+                Review Needed
+              </span>
+            </td>
+            
+            <td class="px-6 py-4 text-right font-semibold" 
+                [ngClass]="{'text-red-600': tx.amount < 0, 'text-green-600': tx.amount > 0}">
+              {{ tx.amount | currency:'INR' }}
+            </td>
+
+             <td class="px-6 py-4 text-right font-semibold" 
+                [ngClass]="{'text-red-600': tx.transactionType == 'debited', 'text-green-600': tx.transactionType == 'credited'}">
+              {{ tx.transactionType}}
+            </td>
+            <td class="px-6 py-2">
+              <select [ngModel]="tx.category" (ngModelChange)= "onCateogryChange($event , tx)"
+                      class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 outline-none">
+                <option *ngFor="let cat of availableCategories" [value]="cat">
+                  {{ cat }}
+                </option>
+              </select>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+
+</div>
+
+
+<div *ngIf="isUploading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl transition-all duration-300">
+  
+  <div class="relative flex items-center justify-center w-24 h-24 mb-6">
+    <div class="absolute inset-0 rounded-full border-4 border-indigo-200 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+    
+    <div class="absolute inset-2 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full shadow-[0_0_20px_rgba(99,102,241,0.5)] flex items-center justify-center">
+      <mat-icon class="text-white scale-150 animate-pulse">auto_awesome</mat-icon>
+    </div>
+  </div>
+
+  <h3 class="text-2xl font-bold text-gray-900 mb-2">Analyzing Statement</h3>
+  
+  <p class="text-indigo-600 font-medium h-6 transition-all duration-300 ease-in-out">
+    {{ currentLoadingMessage }}
+  </p>
+
+  <div class="w-64 h-1.5 bg-gray-200 rounded-full mt-6 overflow-hidden">
+    <div class="h-full bg-indigo-500 rounded-full animate-[indeterminate_1.5s_infinite_linear] origin-left w-full"></div>
+  </div>
+
+</div>
