@@ -26,3 +26,12 @@ This repository contains the Angular frontend for FinSight AI, a UPI-centric fin
    ```bash
    git clone [https://github.com/yourusername/FinSight-AI-Frontend.git](https://github.com/yourusername/FinSight-AI-Frontend.git)
    cd FinSight-AI-Frontend
+
+2. npm install
+3. **Configure Environment:**
+   Update your `src/environments/environment.development.ts` to point to your local backend API.
+
+4. **Run the development server:**
+   ```bash
+   ng serve
+Navigate to http://localhost:4200/.
