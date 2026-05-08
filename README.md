@@ -1,59 +1,28 @@
-# FinanceTrackerFrontend
+# 📈 FinSight AI – Frontend Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+[![Angular](https://img.shields.io/badge/Angular-16+-red)](https://angular.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC)](https://tailwindcss.com/)
+[![RxJS](https://img.shields.io/badge/RxJS-Reactive-pink)](https://rxjs.dev/)
 
-## Development server
+> **The modern, high-performance user interface for the FinSight AI personal finance engine.**
 
-To start a local development server, run:
+This repository contains the Angular frontend for FinSight AI, a UPI-centric financial tracking application. It provides a seamless, responsive experience for users to upload bank statements, review AI-categorized transactions, and manage their monthly budgets.
 
-```bash
-ng serve
-```
+## ✨ Key UI Features
+*   **Human-in-the-Loop (HITL) Interface:** A dedicated staging dashboard where users can review, edit, and approve AI-generated transaction categorizations before they are committed to the database.
+*   **High-Performance Ledger:** Utilizes RxJS debouncing and server-side pagination to instantly search and filter thousands of micro-transactions without browser lag.
+*   **Smart Budget Dashboard:** Real-time visual progress bars and charts tracking spending against category limits using a custom Glassmorphism UI.
+*   **Generative Insights View:** A dedicated analytics screen displaying personalized, AI-generated financial advice based on monthly spending habits.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🛠️ Tech Stack
+*   **Framework:** Angular 19
+*   **Styling:** Tailwind CSS, Angular Material
+*   **State Management/Reactivity:** RxJS
+*   **Routing:** Angular Router (with Route Guards for JWT Auth)
 
-## Code scaffolding
+## 🚀 Local Development Setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/yourusername/FinSight-AI-Frontend.git](https://github.com/yourusername/FinSight-AI-Frontend.git)
+   cd FinSight-AI-Frontend
