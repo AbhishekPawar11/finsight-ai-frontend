@@ -1,6 +1,6 @@
 # 📈 FinSight AI – Frontend Application
 
-[![Angular](https://img.shields.io/badge/Angular-16+-red)](https://angular.io/)
+[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC)](https://tailwindcss.com/)
 [![RxJS](https://img.shields.io/badge/RxJS-Reactive-pink)](https://rxjs.dev/)
 
@@ -33,5 +33,5 @@ This repository contains the Angular frontend for FinSight AI, a UPI-centric fin
 
 4. **Run the development server:**
    ```bash
-   ng serve
+   npm start
 Navigate to http://localhost:4200/.
